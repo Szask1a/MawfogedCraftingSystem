@@ -51,3 +51,31 @@ void UMAWInventoryComponent::CheckIfItemExist(FName ID, bool& bHasItem, FInvento
     }
     bHasItem = false;
 }
+
+FInventoryStack UMAWInventoryComponent::GetAllItemsFromID(FName ID) const
+{
+    int32 LStackQuantity = 0;
+    UMAWCollectableAsset* LStackItem = nullptr;
+    TArray<FStatModifier> LStackData;
+
+    for (const FInventorySlotData& Slot : Inventory)
+    {
+        if (!Slot.bIsOccupied)
+            continue;
+
+        if (Slot.ID == ID)
+        {
+            LStackQuantity += Slot.Stack.Quantity;
+            LStackItem = Slot.Stack.ItemData;
+
+            LStackData.Append(Slot.Stack.CustomData);
+        }
+    }
+
+    FInventoryStack CombinedStack;
+    CombinedStack.ItemData = LStackItem;
+    CombinedStack.Quantity = LStackQuantity;
+    CombinedStack.CustomData = LStackData;
+
+    return CombinedStack;
+}

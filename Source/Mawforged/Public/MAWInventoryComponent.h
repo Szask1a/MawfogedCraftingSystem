@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "FMAWInventorySlotData.h"
 #include "FMAWInventoryStack.h"
+#include "FMAWForgableStat.h"
 #include "MAWInventoryComponent.generated.h"
 
 
@@ -22,6 +24,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Validation")
 	void CheckIfItemExist(FName ID, bool& bHasItem, FInventoryStack& StackData);
+
+	UFUNCTION(BlueprintCallable, Category = "Item Validation")
+	FInventoryStack GetAllItemsFromID(FName ID) const;
 
 protected:
 	// Called when the game starts

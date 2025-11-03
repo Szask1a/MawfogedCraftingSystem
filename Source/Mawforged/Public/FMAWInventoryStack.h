@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "StructUtils/UserDefinedStruct.h"
 #include "MAWCollectableAsset.h"
+#include "FMAWStatModifier.h"
 #include "FMAWInventoryStack.generated.h"
 
 /**
@@ -24,7 +25,7 @@ public:
     int32 Quantity;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Default")
-    TArray<FName> CustomData;
+    TArray<FStatModifier> CustomData;
 
     FInventoryStack()
         : Quantity(0)
