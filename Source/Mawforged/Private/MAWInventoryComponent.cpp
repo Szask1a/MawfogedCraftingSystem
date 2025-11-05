@@ -79,3 +79,90 @@ FInventoryStack UMAWInventoryComponent::GetAllItemsFromID(FName ID) const
 
     return CombinedStack;
 }
+
+template <typename T>
+void UMAWInventoryComponent::FillArray(TArray<T>& TargetArray, int32 Size)
+{
+    if (TargetArray.IsEmpty())
+    {
+        for (int32 Index = 0; Index < Size; ++Index)
+        {
+            TargetArray.AddDefaulted();
+        }
+    }
+}
+
+template <typename T>
+static bool UMAWInventoryComponent::BindItemToSlot(TArray<T>& TargetArray, int32 Index, T Item)
+{
+    if (!TargetArray.IsValidIndex(Index))
+    {
+        return false;
+    }
+
+    TargetArray[Index] = Item;
+    return true;
+}
+
+void UMAWInventoryComponent::InitializeInventory()
+{
+    OwningActor = GetOwner();
+
+    if (!OwningActor)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InventoryComponent on a component with no Owner!"));
+    }
+
+    const int32 InventoryCapacity = InventorySize.Rows * InventorySize.Columns;
+
+    FillArray(Inventory, InventoryCapacity);
+}
+
+double UMAWInventoryComponent::CalculateTotalInventoryWeight() const
+{
+    double TotalWeight = 0.0;
+
+    for (const FInventorySlotData& Slot : Inventory)
+    {
+        const FInventoryStack& Stack = Slot.Stack;
+
+        if (Stack.ItemData && Stack.ItemData->Weight > 0.0)
+        {
+            TotalWeight += static_cast<double>(Stack.Quantity) * Stack.ItemData->Weight;
+        }
+    }
+
+    return TotalWeight;
+}
+
+bool UMAWInventoryComponent::FindEmptyInventorySlot(int32& SlotIndex) const
+{
+    for (int32 Index = 0; Index < Inventory.Num(); ++Index)
+    {
+        const FInventorySlotData& Slot = Inventory[Index];
+        if (!Slot.bIsOccupied)
+        {
+            SlotIndex = Index;
+            return true;
+        }
+    }
+
+    SlotIndex = -1;
+    return false;
+}
+
+void UMAWInventoryComponent::GetAllItemsInInventory(TArray<FName>& IDs, TArray<FInventoryStack>& Stacks) const
+{
+    IDs.Empty();
+    Stacks.Empty();
+
+    for (const FInventorySlotData& SlotData : Inventory)
+    {
+        if (SlotData.bIsOccupied)
+        {
+            IDs.Add(SlotData.ID);
+
+            Stacks.Add(SlotData.Stack);
+        }
+    }
+}
